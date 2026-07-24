@@ -115,7 +115,7 @@ commands:
     exec:
       component: eap
       commandLine: >-
-        ${JBOSS_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0
+        ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0
       label: 'Start JBoss EAP server'
 
   - id: stop-eap
