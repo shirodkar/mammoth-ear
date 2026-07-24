@@ -115,7 +115,7 @@ commands:
     exec:
       component: eap
       commandLine: >-
-        ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090
+        ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090 -Djboss.tx.node.id=mammoth1
       label: 'Start JBoss EAP server'
 
   - id: stop-eap
