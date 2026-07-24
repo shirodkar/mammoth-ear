@@ -33,7 +33,7 @@ components:
       memoryRequest: 1Gi
       cpuLimit: '2'
       cpuRequest: 500m
-      mountSources: true
+      mountSources: false
       endpoints:
         - name: eap-http
           targetPort: 8080
