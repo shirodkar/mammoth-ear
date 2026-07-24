@@ -45,6 +45,8 @@ components:
       env:
         - name: MAMMOTH_API_URL
           value: http://localhost:8180/backend/api/mammoths
+        - name: JBOSS_NODE_NAME
+          value: mammoth1
 
   - name: postgresql
     container:
