@@ -119,13 +119,15 @@ commands:
       component: eap
       commandLine: >-
         export HOSTNAME=mammoth1 &&
-        if grep -q messaging-activemq ${JBOSS_HOME}/standalone/configuration/standalone-openshift.xml; then
+        if grep -q welcome-content ${JBOSS_HOME}/standalone/configuration/standalone-openshift.xml; then
         ${JBOSS_HOME}/bin/jboss-cli.sh --commands="
         embed-server --server-config=standalone-openshift.xml,
         /subsystem=messaging-activemq:remove,
         /socket-binding-group=standard-sockets/socket-binding=messaging:remove,
         /socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove,
         /extension=org.wildfly.extension.messaging-activemq:remove,
+        /subsystem=undertow/server=default-server/host=default-host/location=\\/:remove,
+        /subsystem=undertow/configuration=handler/file=welcome-content:remove,
         stop-embedded-server";
         fi &&
         mkdir -p /tmp/eap-tmp &&
