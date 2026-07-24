@@ -111,6 +111,20 @@ commands:
         isDefault: true
       label: 'Run unit and integration tests'
 
+  - id: start-eap
+    exec:
+      component: eap
+      commandLine: >-
+        ${JBOSS_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0
+      label: 'Start JBoss EAP server'
+
+  - id: stop-eap
+    exec:
+      component: eap
+      commandLine: >-
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --command=shutdown
+      label: 'Stop JBoss EAP server'
+
   - id: configure-eap-datasource
     exec:
       component: eap
