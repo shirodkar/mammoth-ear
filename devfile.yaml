@@ -13,7 +13,7 @@ attributes:
 components:
   - name: tools
     container:
-      image: registry.redhat.io/devspaces/udi-rhel8:latest
+      image: registry.redhat.io/devspaces/udi-rhel9:latest
       memoryLimit: 3Gi
       memoryRequest: 1Gi
       cpuLimit: '2'
@@ -28,7 +28,7 @@ components:
 
   - name: eap
     container:
-      image: registry.redhat.io/jboss-eap-7/eap74-openjdk11-openshift-rhel8:latest
+      image: registry.redhat.io/jboss-eap-7/eap74-openjdk11-openshift-rhel9:latest
       memoryLimit: 2Gi
       memoryRequest: 1Gi
       cpuLimit: '2'
