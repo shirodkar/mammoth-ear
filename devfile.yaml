@@ -142,6 +142,7 @@ commands:
       component: eap
       commandLine: >-
         ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --commands="
+        /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource),
         data-source add
         --name=MammothDS
         --jndi-name=java:jboss/datasources/MammothDS
