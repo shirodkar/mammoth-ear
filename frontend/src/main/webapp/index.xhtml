@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Mammoth Facts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 48px 0 32px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #c9a84c;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #8b949e;
+        }
+
+        /* Section titles */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #c9a84c;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #c9a84c33;
+        }
+
+        /* Overview Section */
+        .overview {
+            padding: 40px 0;
+        }
+
+        .overview-description {
+            font-size: 1.05rem;
+            color: #c9d1d9;
+            margin-bottom: 28px;
+            line-height: 1.8;
+            background: #161b22;
+            padding: 24px;
+            border-radius: 8px;
+            border-left: 4px solid #c9a84c;
+        }
+
+        .taxonomy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .taxonomy-item {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 14px 18px;
+            transition: border-color 0.2s;
+        }
+
+        .taxonomy-item:hover {
+            border-color: #c9a84c;
+        }
+
+        .taxonomy-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #8b949e;
+            margin-bottom: 4px;
+        }
+
+        .taxonomy-value {
+            font-size: 1rem;
+            color: #e6edf3;
+            font-weight: 500;
+        }
+
+        /* Facts Section */
+        .facts-section {
+            padding: 40px 0;
+        }
+
+        .category-block {
+            margin-bottom: 36px;
+        }
+
+        .category-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #d2a24c;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-badge {
+            background: #c9a84c22;
+            color: #c9a84c;
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .fact-card {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .fact-card:hover {
+            transform: translateY(-2px);
+            border-color: #c9a84c;
+            box-shadow: 0 4px 16px rgba(201, 168, 76, 0.1);
+        }
+
+        .fact-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #e6edf3;
+            margin-bottom: 10px;
+        }
+
+        .fact-description {
+            font-size: 0.92rem;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px 0;
+            border-top: 1px solid #21262d;
+            margin-top: 20px;
+        }
+
+        .footer p {
+            color: #484f58;
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: #c9a84c;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .taxonomy-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .facts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">&#129412;</div>
+            <h1>Mammoth Facts</h1>
+            <p>Discover fascinating facts about the iconic giants of the Ice Age</p>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="overview">
+            <h2 class="section-title">Overview</h2>
+            <div class="overview-description">
+                <h:outputText value="#{mammothBean.description}" />
+            </div>
+
+            <h3 style="font-size: 1.1rem; color: #c9a84c; margin-bottom: 14px; margin-top: 24px;">Taxonomy</h3>
+            <div class="taxonomy-grid">
+                <ui:repeat value="#{mammothBean.taxonomyEntries}" var="entry">
+                    <div class="taxonomy-item">
+                        <div class="taxonomy-label"><h:outputText value="#{entry.key}" /></div>
+                        <div class="taxonomy-value"><h:outputText value="#{entry.value}" /></div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </div>
+
+        <!-- Facts Section -->
+        <div class="facts-section">
+            <h2 class="section-title">Fascinating Facts</h2>
+
+            <ui:repeat value="#{mammothBean.factCategories}" var="category">
+                <div class="category-block">
+                    <div class="category-name">
+                        <h:outputText value="#{category.name}" />
+                        <span class="category-badge">
+                            <h:outputText value="#{category.facts.size()} facts" />
+                        </span>
+                    </div>
+                    <div class="facts-grid">
+                        <ui:repeat value="#{category.facts}" var="fact">
+                            <div class="fact-card">
+                                <div class="fact-title"><h:outputText value="#{fact.title}" /></div>
+                                <div class="fact-description"><h:outputText value="#{fact.description}" /></div>
+                            </div>
+                        </ui:repeat>
+                    </div>
+                </div>
+            </ui:repeat>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Mammoth Facts &#8212; A Java EE 8 Application</p>
+        </div>
+
+    </div>
+</h:body>
+
+</html>

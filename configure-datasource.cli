@@ -1,0 +1,38 @@
+# WildFly/JBoss CLI script to configure PostgreSQL datasource for the Mammoth application
+#
+# Prerequisites:
+#   1. PostgreSQL JDBC driver must be deployed as a module or as a deployment
+#   2. A PostgreSQL database named 'mammothdb' must exist
+#
+# Usage:
+#   $JBOSS_HOME/bin/jboss-cli.sh --connect --file=configure-datasource.cli
+#
+# Or run commands manually in jboss-cli:
+
+# Deploy PostgreSQL JDBC driver as a module (adjust path to your driver jar)
+# module add --name=org.postgresql --resources=/path/to/postgresql-42.7.3.jar --dependencies=javax.api,javax.transaction.api
+
+# Register the JDBC driver
+/subsystem=datasources/jdbc-driver=postgresql:add( \
+    driver-name=postgresql, \
+    driver-module-name=org.postgresql, \
+    driver-class-name=org.postgresql.Driver, \
+    driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource \
+)
+
+# Create the datasource
+data-source add \
+    --name=MammothDS \
+    --jndi-name=java:jboss/datasources/MammothDS \
+    --driver-name=postgresql \
+    --connection-url=jdbc:postgresql://localhost:5432/mammothdb \
+    --user-name=mammoth \
+    --password=mammoth \
+    --use-java-context=true \
+    --jta=true \
+    --min-pool-size=5 \
+    --max-pool-size=20 \
+    --enabled=true
+
+# Reload the server
+reload

@@ -1,0 +1,147 @@
+schemaVersion: 2.2.0
+metadata:
+  name: mammoth-ear
+  version: 1.0.0
+  description: Java EE 8 mammoth facts application with PostgreSQL backend and JSF frontend
+attributes:
+  .vscode/extensions.json: |
+    {
+      "recommendations": [
+        "redhat.mta-vscode-extension"
+      ]
+    }
+components:
+  - name: tools
+    container:
+      image: registry.redhat.io/devspaces/udi-rhel8:latest
+      memoryLimit: 3Gi
+      memoryRequest: 1Gi
+      cpuLimit: '2'
+      cpuRequest: 500m
+      mountSources: true
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      env:
+        - name: JAVA_HOME
+          value: /usr/lib/jvm/java-11-openjdk
+
+  - name: eap
+    container:
+      image: registry.redhat.io/jboss-eap-7/eap74-openjdk11-openshift-rhel8:latest
+      memoryLimit: 2Gi
+      memoryRequest: 1Gi
+      cpuLimit: '2'
+      cpuRequest: 500m
+      mountSources: true
+      endpoints:
+        - name: eap-http
+          targetPort: 8080
+          exposure: public
+          protocol: https
+        - name: eap-admin
+          targetPort: 9990
+          exposure: internal
+      env:
+        - name: MAMMOTH_API_URL
+          value: http://localhost:8080/backend/api/mammoths
+
+  - name: postgresql
+    container:
+      image: registry.redhat.io/rhel9/postgresql-15:latest
+      memoryLimit: 512Mi
+      memoryRequest: 256Mi
+      cpuLimit: 500m
+      cpuRequest: 100m
+      mountSources: true
+      volumeMounts:
+        - name: postgresql-data
+          path: /var/lib/pgsql/data
+      endpoints:
+        - name: postgresql
+          targetPort: 5432
+          exposure: internal
+      env:
+        - name: POSTGRESQL_USER
+          value: mammoth
+        - name: POSTGRESQL_PASSWORD
+          value: mammoth
+        - name: POSTGRESQL_DATABASE
+          value: mammothdb
+
+  - name: postgresql-data
+    volume:
+      size: 1Gi
+
+  - name: m2
+    volume:
+      size: 2Gi
+
+commands:
+  - id: init-db
+    exec:
+      component: postgresql
+      commandLine: psql -U mammoth -d mammothdb -f ${PROJECT_SOURCE}/init-db.sql
+      workingDir: ${PROJECT_SOURCE}
+      label: 'Initialize database with mammoth facts'
+
+  - id: build
+    exec:
+      component: tools
+      commandLine: mvn clean install -DskipTests
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+        isDefault: true
+      label: 'Build the EAR application'
+
+  - id: test
+    exec:
+      component: tools
+      commandLine: mvn clean verify
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: test
+        isDefault: true
+      label: 'Run unit and integration tests'
+
+  - id: configure-eap-datasource
+    exec:
+      component: eap
+      commandLine: >-
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --commands="
+        data-source add
+        --name=MammothDS
+        --jndi-name=java:jboss/datasources/MammothDS
+        --driver-name=postgresql
+        --connection-url=jdbc:postgresql://localhost:5432/mammothdb
+        --user-name=mammoth
+        --password=mammoth
+        --use-java-context=true
+        --jta=true
+        --min-pool-size=5
+        --max-pool-size=20
+        --enabled=true"
+      label: 'Configure PostgreSQL datasource in EAP'
+
+  - id: deploy
+    exec:
+      component: eap
+      commandLine: >-
+        cp ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear ${JBOSS_HOME}/standalone/deployments/
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: run
+        isDefault: true
+      label: 'Deploy EAR to JBoss EAP'
+
+  - id: undeploy
+    exec:
+      component: eap
+      commandLine: >-
+        rm -f ${JBOSS_HOME}/standalone/deployments/mammoth-ear.ear
+      label: 'Undeploy EAR from JBoss EAP'
+
+events:
+  postStart:
+    - init-db
