@@ -120,15 +120,7 @@ commands:
       commandLine: |
         export HOSTNAME=mammoth1 &&
         if grep -q welcome-content ${JBOSS_HOME}/standalone/configuration/standalone-openshift.xml; then
-          ${JBOSS_HOME}/bin/jboss-cli.sh --commands="
-            embed-server --server-config=standalone-openshift.xml,
-            /subsystem=messaging-activemq:remove,
-            /socket-binding-group=standard-sockets/socket-binding=messaging:remove,
-            /socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove,
-            /extension=org.wildfly.extension.messaging-activemq:remove,
-            /subsystem=undertow/server=default-server/host=default-host/location=\\/:remove,
-            /subsystem=undertow/configuration=handler/file=welcome-content:remove,
-            stop-embedded-server";
+          ${JBOSS_HOME}/bin/jboss-cli.sh --commands="embed-server --server-config=standalone-openshift.xml,/subsystem=messaging-activemq:remove,/socket-binding-group=standard-sockets/socket-binding=messaging:remove,/socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove,/extension=org.wildfly.extension.messaging-activemq:remove,/subsystem=undertow/server=default-server/host=default-host/location=\\/:remove,/subsystem=undertow/configuration=handler/file=welcome-content:remove,stop-embedded-server"
         fi &&
         mkdir -p /tmp/eap-tmp &&
         nohup ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090 -Djboss.server.temp.dir=/tmp/eap-tmp > /tmp/eap.log 2>&1 &
