@@ -114,25 +114,47 @@ commands:
         isDefault: true
       label: 'Run unit and integration tests'
 
+  - id: init-eap
+    exec:
+      component: eap
+      commandLine: |
+        export HOSTNAME=mammoth1 &&
+        if grep -q welcome-content ${JBOSS_HOME}/standalone/configuration/standalone-openshift.xml; then
+          ${JBOSS_HOME}/bin/jboss-cli.sh --commands="
+            embed-server --server-config=standalone-openshift.xml,
+            /subsystem=messaging-activemq:remove,
+            /socket-binding-group=standard-sockets/socket-binding=messaging:remove,
+            /socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove,
+            /extension=org.wildfly.extension.messaging-activemq:remove,
+            /subsystem=undertow/server=default-server/host=default-host/location=\\/:remove,
+            /subsystem=undertow/configuration=handler/file=welcome-content:remove,
+            stop-embedded-server";
+        fi &&
+        mkdir -p /tmp/eap-tmp &&
+        nohup ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090 -Djboss.server.temp.dir=/tmp/eap-tmp > /tmp/eap.log 2>&1 &
+        echo "Waiting for EAP to start..." &&
+        for i in $(seq 1 60); do
+          if ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --command=":read-attribute(name=server-state)" 2>/dev/null | grep -q running; then
+            echo "EAP is running";
+            break;
+          fi;
+          sleep 3;
+        done &&
+        mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main &&
+        curl -sL -o ${JBOSS_HOME}/modules/org/postgresql/main/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-42.7.3.jar &&
+        printf '<?xml version="1.0" encoding="UTF-8"?>\n<module xmlns="urn:jboss:module:1.3" name="org.postgresql">\n  <resources>\n    <resource-root path="postgresql-jdbc.jar"/>\n  </resources>\n  <dependencies>\n    <module name="javax.api"/>\n    <module name="javax.transaction.api"/>\n  </dependencies>\n</module>\n' > ${JBOSS_HOME}/modules/org/postgresql/main/module.xml &&
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --commands="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource),data-source add --name=MammothDS --jndi-name=java:jboss/datasources/MammothDS --driver-name=postgresql --connection-url=jdbc:postgresql://localhost:5432/mammothdb --user-name=mammoth --password=mammoth --use-java-context=true --jta=true --min-pool-size=5 --max-pool-size=20 --enabled=true" &&
+        echo "EAP initialized with PostgreSQL datasource"
+      label: 'Start EAP, install PostgreSQL driver, and configure datasource'
+
   - id: start-eap
     exec:
       component: eap
       commandLine: >-
         export HOSTNAME=mammoth1 &&
-        if grep -q welcome-content ${JBOSS_HOME}/standalone/configuration/standalone-openshift.xml; then
-        ${JBOSS_HOME}/bin/jboss-cli.sh --commands="
-        embed-server --server-config=standalone-openshift.xml,
-        /subsystem=messaging-activemq:remove,
-        /socket-binding-group=standard-sockets/socket-binding=messaging:remove,
-        /socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove,
-        /extension=org.wildfly.extension.messaging-activemq:remove,
-        /subsystem=undertow/server=default-server/host=default-host/location=\\/:remove,
-        /subsystem=undertow/configuration=handler/file=welcome-content:remove,
-        stop-embedded-server";
-        fi &&
         mkdir -p /tmp/eap-tmp &&
         ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090 -Djboss.server.temp.dir=/tmp/eap-tmp
-      label: 'Start JBoss EAP server'
+      label: 'Start JBoss EAP server (foreground)'
 
   - id: stop-eap
     exec:
@@ -140,16 +162,6 @@ commands:
       commandLine: >-
         ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --command=shutdown
       label: 'Stop JBoss EAP server'
-
-  - id: configure-eap-datasource
-    exec:
-      component: eap
-      commandLine: |
-        mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main &&
-        curl -L -o ${JBOSS_HOME}/modules/org/postgresql/main/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-42.7.3.jar &&
-        printf '<?xml version="1.0" encoding="UTF-8"?>\n<module xmlns="urn:jboss:module:1.3" name="org.postgresql">\n  <resources>\n    <resource-root path="postgresql-jdbc.jar"/>\n  </resources>\n  <dependencies>\n    <module name="javax.api"/>\n    <module name="javax.transaction.api"/>\n  </dependencies>\n</module>\n' > ${JBOSS_HOME}/modules/org/postgresql/main/module.xml &&
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --commands="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource),data-source add --name=MammothDS --jndi-name=java:jboss/datasources/MammothDS --driver-name=postgresql --connection-url=jdbc:postgresql://localhost:5432/mammothdb --user-name=mammoth --password=mammoth --use-java-context=true --jta=true --min-pool-size=5 --max-pool-size=20 --enabled=true"
-      label: 'Install PostgreSQL driver and configure datasource'
 
   - id: deploy
     exec:
@@ -172,3 +184,4 @@ commands:
 events:
   postStart:
     - init-db
+    - init-eap
