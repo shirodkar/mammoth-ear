@@ -140,22 +140,12 @@ commands:
   - id: configure-eap-datasource
     exec:
       component: eap
-      commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --commands="
-        /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource),
-        data-source add
-        --name=MammothDS
-        --jndi-name=java:jboss/datasources/MammothDS
-        --driver-name=postgresql
-        --connection-url=jdbc:postgresql://localhost:5432/mammothdb
-        --user-name=mammoth
-        --password=mammoth
-        --use-java-context=true
-        --jta=true
-        --min-pool-size=5
-        --max-pool-size=20
-        --enabled=true"
-      label: 'Configure PostgreSQL datasource in EAP'
+      commandLine: |
+        mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main &&
+        curl -L -o ${JBOSS_HOME}/modules/org/postgresql/main/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-42.7.3.jar &&
+        printf '<?xml version="1.0" encoding="UTF-8"?>\n<module xmlns="urn:jboss:module:1.3" name="org.postgresql">\n  <resources>\n    <resource-root path="postgresql-jdbc.jar"/>\n  </resources>\n  <dependencies>\n    <module name="javax.api"/>\n    <module name="javax.transaction.api"/>\n  </dependencies>\n</module>\n' > ${JBOSS_HOME}/modules/org/postgresql/main/module.xml &&
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --commands="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource),data-source add --name=MammothDS --jndi-name=java:jboss/datasources/MammothDS --driver-name=postgresql --connection-url=jdbc:postgresql://localhost:5432/mammothdb --user-name=mammoth --password=mammoth --use-java-context=true --jta=true --min-pool-size=5 --max-pool-size=20 --enabled=true"
+      label: 'Install PostgreSQL driver and configure datasource'
 
   - id: deploy
     exec:
