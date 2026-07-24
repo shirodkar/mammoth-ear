@@ -39,7 +39,7 @@ components:
         - name: eap-http
           targetPort: 8180
           exposure: public
-          protocol: https
+          protocol: http
         - name: eap-admin
           targetPort: 10090
           exposure: internal
