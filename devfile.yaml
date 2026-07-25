@@ -3,6 +3,13 @@ metadata:
   name: mammoth-ear
   version: 1.0.0
   description: Java EE 8 mammoth facts application with PostgreSQL backend and JSF frontend
+attributes:
+  .vscode/settings.json: |
+    {
+      "java.server.launchMode": "Standard",
+      "java.configuration.updateBuildConfiguration": "automatic",
+      "mta-core.genai.agentMode": true
+    }
 components:
   - name: tools
     container:
