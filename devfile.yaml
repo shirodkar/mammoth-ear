@@ -177,3 +177,4 @@ commands:
 events:
   postStart:
     - init-db
+    - init-eap
