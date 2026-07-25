@@ -1,0 +1,5 @@
+{
+    "mta-core.genai.agentMode": true,
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.server.launchMode": "Standard"
+}
