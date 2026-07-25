@@ -27,6 +27,14 @@ components:
           value: /usr/lib/jvm/java-11-openjdk
         - name: DEFAULT_EXTENSIONS
           value: /tmp/extensions/redhat.mta-vscode-extension.vsix
+        - name: FORCE_HUB_ENABLED
+          value: 'true'
+        - name: HUB_URL
+          value: 'https://mta-openshift-mta.apps.ocp.m5xh7.sandbox3548.opentlc.com'
+        - name: HUB_PROFILE_SYNC_ENABLED
+          value: 'true'
+        - name: HUB_SOLUTION_SERVER_ENABLED
+          value: 'true'
 
   - name: eap
     container:
