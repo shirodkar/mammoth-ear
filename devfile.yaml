@@ -158,7 +158,8 @@ commands:
     exec:
       component: eap
       commandLine: >-
-        cp ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear ${JBOSS_HOME}/standalone/deployments/
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090
+        --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
       workingDir: ${PROJECT_SOURCE}
       group:
         kind: run
@@ -169,7 +170,8 @@ commands:
     exec:
       component: eap
       commandLine: >-
-        rm -f ${JBOSS_HOME}/standalone/deployments/mammoth-ear.ear
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090
+        --command="undeploy mammoth-ear.ear"
       label: 'Undeploy EAR from JBoss EAP'
 
 events:
