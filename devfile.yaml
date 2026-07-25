@@ -3,13 +3,6 @@ metadata:
   name: mammoth-ear
   version: 1.0.0
   description: Java EE 8 mammoth facts application with PostgreSQL backend and JSF frontend
-attributes:
-  .vscode/extensions.json: |
-    {
-      "recommendations": [
-        "redhat.mta-vscode-extension"
-      ]
-    }
 components:
   - name: tools
     container:

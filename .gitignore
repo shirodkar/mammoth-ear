@@ -10,7 +10,8 @@ target/
 .project
 .classpath
 .settings/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 *.swp
 *.swo
 *~
