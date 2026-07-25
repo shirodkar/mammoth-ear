@@ -186,4 +186,5 @@ events:
   postStart:
     - init-db
     - init-eap
-    - build-and-deploy
+    - build
+    - deploy
