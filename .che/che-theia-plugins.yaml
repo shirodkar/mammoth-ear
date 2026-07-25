@@ -1,0 +1,4 @@
+- id: redhat/java/latest
+  override:
+    preferences:
+      java.server.launchMode: Standard
