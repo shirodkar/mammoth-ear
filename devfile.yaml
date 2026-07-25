@@ -84,8 +84,11 @@ commands:
         curl -sL -o /tmp/extensions/redhat.mta-vscode-extension.vsix.gz
         https://open-vsx.org/api/redhat/mta-vscode-extension/8.2.0/file/redhat.mta-vscode-extension-8.2.0.vsix &&
         gunzip -f /tmp/extensions/redhat.mta-vscode-extension.vsix.gz 2>/dev/null;
+        mkdir -p /checode/remote/data/User/globalStorage/redhat.mta-core/settings &&
+        cp ${PROJECT_SOURCE}/.vscode/mta-core/settings/provider-settings.yaml
+        /checode/remote/data/User/globalStorage/redhat.mta-core/settings/provider-settings.yaml;
         true
-      label: 'Download MTA VS Code extension'
+      label: 'Download MTA extension and configure provider settings'
 
   - id: init-db
     exec:
