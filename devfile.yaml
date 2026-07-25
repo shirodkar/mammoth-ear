@@ -162,6 +162,15 @@ commands:
       parallel: false
       label: 'Build and deploy EAR to JBoss EAP'
 
+  - id: setup
+    composite:
+      commands:
+        - init-eap
+        - build
+        - deploy
+      parallel: false
+      label: 'Initialize EAP, build, and deploy'
+
   - id: deploy
     exec:
       component: eap
