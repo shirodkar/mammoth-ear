@@ -154,23 +154,6 @@ commands:
         ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --command=shutdown
       label: 'Stop JBoss EAP server'
 
-  - id: build-and-deploy
-    composite:
-      commands:
-        - build
-        - deploy
-      parallel: false
-      label: 'Build and deploy EAR to JBoss EAP'
-
-  - id: start-app
-    composite:
-      commands:
-        - init-eap
-        - build
-        - deploy
-      parallel: false
-      label: 'Initialize EAP, build, and deploy'
-
   - id: deploy
     exec:
       component: eap
