@@ -30,7 +30,7 @@ components:
         - name: FORCE_HUB_ENABLED
           value: 'true'
         - name: HUB_URL
-          value: 'https://mta-openshift-mta.apps.ocp.m5xh7.sandbox3548.opentlc.com'
+          value: 'https://mta-openshift-mta.apps.cluster-bk7k2.dyn.redhatworkshops.io'
         - name: HUB_PROFILE_SYNC_ENABLED
           value: 'true'
         - name: HUB_SOLUTION_SERVER_ENABLED
