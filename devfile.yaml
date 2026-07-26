@@ -105,7 +105,7 @@ commands:
         cp ${PROJECT_SOURCE}/.vscode/mta-core/settings/provider-settings.yaml
         /checode/remote/data/User/globalStorage/redhat.mta-core/settings/provider-settings.yaml;
         mkdir -p /checode/remote/data/Machine &&
-        echo '{"java.server.launchMode":"Standard"}' > /checode/remote/data/Machine/settings.json;
+        echo '{"java.server.launchMode":"Standard","mta-core.genai.agentMode":true}' > /checode/remote/data/Machine/settings.json;
         true
       label: 'Download MTA extension and configure provider settings'
 
