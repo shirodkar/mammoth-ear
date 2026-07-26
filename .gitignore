@@ -16,6 +16,7 @@ target/
 !.vscode/mta-core/
 .vscode/mta-core/*
 !.vscode/mta-core/settings/
+.konveyor/
 *.swp
 *.swo
 *~
