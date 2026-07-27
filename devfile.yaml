@@ -315,21 +315,21 @@ commands:
       commandLine: >-
         export HOSTNAME=mammoth2 &&
         mkdir -p /tmp/eap8-tmp &&
-        ${JBOSS_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8280 -Djboss.management.http.port=10190 -Djboss.server.temp.dir=/tmp/eap8-tmp
+        /opt/server/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8280 -Djboss.management.http.port=10190 -Djboss.server.temp.dir=/tmp/eap8-tmp
       label: 'Start JBoss EAP 8 server (foreground)'
 
   - id: stop-eap8
     exec:
       component: eap8
       commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190 --command=shutdown
+        /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190 --command=shutdown
       label: 'Stop JBoss EAP 8 server'
 
   - id: deploy-eap8
     exec:
       component: eap8
       commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190
+        /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190
         --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
       workingDir: ${PROJECT_SOURCE}
       label: 'Deploy EAR to JBoss EAP 8'
@@ -338,7 +338,7 @@ commands:
     exec:
       component: eap8
       commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190
+        /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190
         --command="undeploy mammoth-ear.ear"
       label: 'Undeploy EAR from JBoss EAP 8'
 
