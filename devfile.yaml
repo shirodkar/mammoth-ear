@@ -70,6 +70,8 @@ components:
       cpuRequest: '1'
       mountSources: true
       sourceMapping: /projects
+      command: ['tail']
+      args: ['-f', '/dev/null']
       endpoints:
         - name: eap8-http
           targetPort: 8280
