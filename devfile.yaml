@@ -38,29 +38,6 @@ components:
         - name: HUB_SOLUTION_SERVER_ENABLED
           value: 'true'
 
-  - name: eap7
-    container:
-      image: registry.redhat.io/jboss-eap-7/eap74-openjdk11-openshift-rhel8:latest
-      memoryLimit: 3Gi
-      memoryRequest: 1Gi
-      cpuLimit: '2'
-      cpuRequest: '1'
-      mountSources: true
-      sourceMapping: /projects
-      endpoints:
-        - name: eap7-http
-          targetPort: 8180
-          exposure: public
-          protocol: http
-        - name: eap7-admin
-          targetPort: 10090
-          exposure: internal
-      env:
-        - name: MAMMOTH_API_URL
-          value: http://localhost:8180/backend/api/mammoths
-        - name: JBOSS_NODE_NAME
-          value: mammoth1
-
   - name: eap8
     container:
       image: registry.redhat.io/jboss-eap-8/eap81-openjdk21-builder-openshift-rhel9:latest
@@ -167,66 +144,6 @@ commands:
         isDefault: true
       label: 'Run unit and integration tests'
 
-  - id: init-eap7
-    exec:
-      component: eap7
-      commandLine: |
-        export HOSTNAME=mammoth1 &&
-        mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main &&
-        curl -sL -o ${JBOSS_HOME}/modules/org/postgresql/main/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-42.7.3.jar &&
-        printf '<?xml version="1.0" encoding="UTF-8"?>\n<module xmlns="urn:jboss:module:1.3" name="org.postgresql">\n  <resources>\n    <resource-root path="postgresql-jdbc.jar"/>\n  </resources>\n  <dependencies>\n    <module name="javax.api"/>\n    <module name="javax.transaction.api"/>\n  </dependencies>\n</module>\n' > ${JBOSS_HOME}/modules/org/postgresql/main/module.xml &&
-        curl -sL -o /tmp/configure.cli https://raw.githubusercontent.com/shirodkar/my-gitops/main/eap/applications/mammoth-ear/scripts/configure.cli &&
-        ${JBOSS_HOME}/bin/jboss-cli.sh --file=/tmp/configure.cli &&
-        echo "EAP 7 configured" &&
-        mkdir -p /tmp/eap-tmp &&
-        nohup ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090 -Djboss.server.temp.dir=/tmp/eap-tmp > /tmp/eap.log 2>&1 &
-        echo "Waiting for EAP 7 to start..." &&
-        for i in $(seq 1 60); do
-          if ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --command=":read-attribute(name=server-state)" 2>/dev/null | grep -q running; then
-            echo "EAP 7 is running";
-            break;
-          fi;
-          sleep 3;
-        done &&
-        echo "EAP 7 initialized with PostgreSQL datasource"
-      label: 'Start EAP 7, install PostgreSQL driver, and configure datasource'
-
-  - id: start-eap7
-    exec:
-      component: eap7
-      commandLine: >-
-        export HOSTNAME=mammoth1 &&
-        mkdir -p /tmp/eap-tmp &&
-        ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090 -Djboss.server.temp.dir=/tmp/eap-tmp
-      label: 'Start JBoss EAP 7 server (foreground)'
-
-  - id: stop-eap7
-    exec:
-      component: eap7
-      commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --command=shutdown
-      label: 'Stop JBoss EAP 7 server'
-
-  - id: deploy-eap7
-    exec:
-      component: eap7
-      commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090
-        --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: run
-        isDefault: true
-      label: 'Deploy EAR to JBoss EAP 7'
-
-  - id: undeploy-eap7
-    exec:
-      component: eap7
-      commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090
-        --command="undeploy mammoth-ear.ear"
-      label: 'Undeploy EAR from JBoss EAP 7'
-
   - id: init-eap8
     exec:
       component: eap8
@@ -332,6 +249,9 @@ commands:
         /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190
         --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
       workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: run
+        isDefault: true
       label: 'Deploy EAR to JBoss EAP 8'
 
   - id: undeploy-eap8
