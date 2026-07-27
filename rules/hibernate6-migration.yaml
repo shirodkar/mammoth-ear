@@ -2,7 +2,7 @@
   description: Hibernate 6.x requires Jakarta JSON Binding (JSON-B) provider
   when:
     builtin.xml:
-      xpath: "//m:dependency[m:groupId/text()='org.hibernate.orm' and m:artifactId/text()='hibernate-core']"
+      xpath: "//m:dependency[m:groupId/text()='org.hibernate.orm' and m:artifactId/text()='hibernate-core' and not(parent::m:dependencies/m:dependency[m:groupId/text()='org.eclipse' and m:artifactId/text()='yasson'])]"
       namespaces:
         m: "http://maven.apache.org/POM/4.0.0"
       filepaths:
