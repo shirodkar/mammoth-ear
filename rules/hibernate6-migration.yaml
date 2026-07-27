@@ -1,0 +1,39 @@
+- ruleID: hibernate6-requires-yasson-00001
+  description: Hibernate 6.x requires Jakarta JSON Binding (JSON-B) provider
+  when:
+    builtin.xml:
+      xpath: "//m:dependency[m:groupId/text()='org.hibernate.orm' and m:artifactId/text()='hibernate-core']"
+      namespaces:
+        m: "http://maven.apache.org/POM/4.0.0"
+      filepaths:
+        - pom.xml
+  message: |
+    Hibernate ORM 6.x (used by EAP 8) introduced a `JsonBJsonFormatMapper` that requires a Jakarta
+    JSON Binding (JSON-B) implementation at runtime. Without it, `SessionFactory` initialization fails with:
+
+        jakarta.json.bind.JsonbException: JSON Binding provider
+        org.eclipse.yasson.JsonBindingProvider not found
+
+    Add the Eclipse Yasson dependency:
+
+    ```xml
+    <dependency>
+        <groupId>org.eclipse</groupId>
+        <artifactId>yasson</artifactId>
+        <version>3.0.3</version>
+    </dependency>
+    ```
+
+    In EAP 8 the server provides JSON-B, so this is only needed for standalone tests that
+    bootstrap Hibernate outside the container (e.g. integration tests using
+    `Persistence.createEntityManagerFactory`).
+  effort: 1
+  labels:
+    - "konveyor.io/source=eap7"
+    - "konveyor.io/target=eap8"
+  links:
+    - title: Hibernate ORM 6 Migration Guide
+      url: https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html
+    - title: "Eclipse Yasson: Jakarta JSON Binding Reference Implementation"
+      url: https://projects.eclipse.org/projects/ee4j.yasson
+  category: potential
