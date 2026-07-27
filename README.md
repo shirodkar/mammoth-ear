@@ -2,7 +2,7 @@
 
 A Java EE 8 multi-module EAR application that serves fascinating facts about woolly mammoths, with a JPA/PostgreSQL backend REST API and a JSF dark-mode frontend.
 
-[![Contribute](https://img.shields.io/badge/Dev%20Spaces-Contribute-blue?logo=redhat&logoColor=white)](https://devspaces.apps.ocp.m5xh7.sandbox3548.opentlc.com/#https://github.com/shirodkar/mammoth-ear/tree/mta-claude-072726)
+[![Contribute](https://img.shields.io/badge/Dev%20Spaces-Contribute-blue?logo=redhat&logoColor=white)](https://devspaces.apps.ocp.m5xh7.sandbox3548.opentlc.com/#https://github.com/shirodkar/mammoth-ear/tree/eap8)
 
 ## Architecture
 
