@@ -32,7 +32,7 @@ class MammothBeanTest {
         Logger.getLogger(MammothBean.class.getName()).setLevel(originalLevel);
     }
 
-    private static final String UNREACHABLE_URL = "http://127.0.0.1:1/api/mammoths";
+    private static final String UNREACHABLE_URL = "http://localhost:1/api/mammoths";
 
     @BeforeEach
     void setUp() {

@@ -3,10 +3,10 @@ package com.example.mammoth.integration;
 import com.example.mammoth.model.MammothFact;
 import org.junit.jupiter.api.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceException;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Persistence;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
