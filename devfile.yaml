@@ -292,7 +292,7 @@ commands:
         fi &&
         mkdir -p ${EAP_HOME}/modules/org/postgresql/main &&
         curl -sL -o ${EAP_HOME}/modules/org/postgresql/main/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-42.7.3.jar &&
-        printf '<?xml version="1.0" encoding="UTF-8"?>\n<module xmlns="urn:jboss:module:1.3" name="org.postgresql">\n  <resources>\n    <resource-root path="postgresql-jdbc.jar"/>\n  </resources>\n  <dependencies>\n    <module name="jakarta.api"/>\n    <module name="jakarta.transaction.api"/>\n  </dependencies>\n</module>\n' > ${EAP_HOME}/modules/org/postgresql/main/module.xml &&
+        printf '<?xml version="1.0" encoding="UTF-8"?>\n<module xmlns="urn:jboss:module:1.3" name="org.postgresql">\n  <resources>\n    <resource-root path="postgresql-jdbc.jar"/>\n  </resources>\n  <dependencies>\n    <module name="java.sql"/>\n    <module name="jakarta.transaction.api"/>\n  </dependencies>\n</module>\n' > ${EAP_HOME}/modules/org/postgresql/main/module.xml &&
         printf 'embed-server --server-config=standalone.xml\n/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql, driver-module-name=org.postgresql, driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)\ndata-source add --name=MammothDS --jndi-name=java:jboss/datasources/MammothDS --driver-name=postgresql --connection-url=jdbc:postgresql://localhost:5432/mammothdb --user-name=mammoth --password=mammoth --use-java-context=true --jta=true --min-pool-size=5 --max-pool-size=20 --enabled=true\nstop-embedded-server\n' > /tmp/configure-eap8.cli &&
         ${EAP_HOME}/bin/jboss-cli.sh --file=/tmp/configure-eap8.cli &&
         echo "EAP 8 configured" &&
