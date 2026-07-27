@@ -255,9 +255,9 @@ commands:
           <build>
             <plugins>
               <plugin>
-                <groupId>org.jboss.eap.plugins</groupId>
-                <artifactId>eap-maven-plugin</artifactId>
-                <version>1.0.0.Final-redhat-00014</version>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>5.0.1.Final</version>
                 <configuration>
                   <channels>
                     <channel>
@@ -277,14 +277,14 @@ commands:
                     <layer>ejb</layer>
                     <layer>jsf</layer>
                   </layers>
-                  <provisioning-dir>/opt/server</provisioning-dir>
+                  <provisioningDir>/opt/server</provisioningDir>
                 </configuration>
               </plugin>
             </plugins>
           </build>
         </project>
         POMEOF
-          mvn -f /tmp/eap8-provision/pom.xml org.jboss.eap.plugins:eap-maven-plugin:provision &&
+          mvn -f /tmp/eap8-provision/pom.xml wildfly:provision &&
           echo "EAP 8 provisioned at ${EAP_HOME}";
           if [ ! -f "${EAP_HOME}/bin/standalone.sh" ]; then
             echo "ERROR: Provisioning failed."; exit 1;
