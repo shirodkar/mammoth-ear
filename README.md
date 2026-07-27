@@ -47,9 +47,9 @@ mvn clean verify
 
 Click the **Contribute** badge above to launch a preconfigured workspace with PostgreSQL, JBoss EAP 7.4, and the MTA extension. Then run the devfile tasks:
 
-1. **init-eap** — Downloads the PostgreSQL driver, configures the datasource, and starts EAP
+1. **init-eap7** — Downloads the PostgreSQL driver, configures the datasource, and starts EAP 7
 2. **build** — `mvn clean install -DskipTests`
-3. **deploy** — Deploys the EAR to JBoss EAP via CLI
+3. **deploy-eap7** — Deploys the EAR to JBoss EAP 7 via CLI
 
 ## Project Structure
 
