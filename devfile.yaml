@@ -14,10 +14,10 @@ components:
   - name: tools
     container:
       image: registry.redhat.io/devspaces/udi-rhel9:latest
-      memoryLimit: 3Gi
-      memoryRequest: 1Gi
-      cpuLimit: '2'
-      cpuRequest: 500m
+      memoryLimit: 6Gi
+      memoryRequest: 2Gi
+      cpuLimit: '4'
+      cpuRequest: '1'
       mountSources: true
       volumeMounts:
         - name: m2
@@ -41,10 +41,10 @@ components:
   - name: eap
     container:
       image: registry.redhat.io/jboss-eap-7/eap74-openjdk11-openshift-rhel8:latest
-      memoryLimit: 2Gi
+      memoryLimit: 3Gi
       memoryRequest: 1Gi
       cpuLimit: '2'
-      cpuRequest: 500m
+      cpuRequest: '1'
       mountSources: true
       sourceMapping: /projects
       endpoints:
