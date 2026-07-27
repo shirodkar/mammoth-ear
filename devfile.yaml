@@ -61,6 +61,29 @@ components:
         - name: JBOSS_NODE_NAME
           value: mammoth1
 
+  - name: eap8
+    container:
+      image: registry.redhat.io/jboss-eap-8/eap81-openjdk21-builder-openshift-rhel9:latest
+      memoryLimit: 3Gi
+      memoryRequest: 1Gi
+      cpuLimit: '2'
+      cpuRequest: '1'
+      mountSources: true
+      sourceMapping: /projects
+      endpoints:
+        - name: eap8-http
+          targetPort: 8280
+          exposure: public
+          protocol: http
+        - name: eap8-admin
+          targetPort: 10190
+          exposure: internal
+      env:
+        - name: MAMMOTH_API_URL
+          value: http://localhost:8280/backend/api/mammoths
+        - name: JBOSS_NODE_NAME
+          value: mammoth2
+
   - name: postgresql
     container:
       image: registry.redhat.io/rhel9/postgresql-15:latest
@@ -201,6 +224,72 @@ commands:
         ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090
         --command="undeploy mammoth-ear.ear"
       label: 'Undeploy EAR from JBoss EAP'
+
+  - id: init-eap8
+    exec:
+      component: eap8
+      commandLine: |
+        export HOSTNAME=mammoth2 &&
+        if [ ! -f "${JBOSS_HOME}/bin/standalone.sh" ]; then
+          echo "Provisioning EAP 8 server via Galleon..." &&
+          export GALLEON_PROVISION_FEATURE_PACKS="org.jboss.eap:wildfly-ee-galleon-pack" &&
+          export GALLEON_PROVISION_LAYERS="cloud-server,ejb,jsf" &&
+          /usr/local/s2i/assemble 2>&1 | tail -20;
+          if [ ! -f "${JBOSS_HOME}/bin/standalone.sh" ]; then
+            echo "ERROR: Could not provision EAP 8. Check logs."; exit 1;
+          fi;
+        fi &&
+        mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main &&
+        curl -sL -o ${JBOSS_HOME}/modules/org/postgresql/main/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-42.7.3.jar &&
+        printf '<?xml version="1.0" encoding="UTF-8"?>\n<module xmlns="urn:jboss:module:1.3" name="org.postgresql">\n  <resources>\n    <resource-root path="postgresql-jdbc.jar"/>\n  </resources>\n  <dependencies>\n    <module name="jakarta.api"/>\n    <module name="jakarta.transaction.api"/>\n  </dependencies>\n</module>\n' > ${JBOSS_HOME}/modules/org/postgresql/main/module.xml &&
+        printf 'embed-server --server-config=standalone.xml\n/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql, driver-module-name=org.postgresql, driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)\ndata-source add --name=MammothDS --jndi-name=java:jboss/datasources/MammothDS --driver-name=postgresql --connection-url=jdbc:postgresql://localhost:5432/mammothdb --user-name=mammoth --password=mammoth --use-java-context=true --jta=true --min-pool-size=5 --max-pool-size=20 --enabled=true\nstop-embedded-server\n' > /tmp/configure-eap8.cli &&
+        ${JBOSS_HOME}/bin/jboss-cli.sh --file=/tmp/configure-eap8.cli &&
+        echo "EAP 8 configured" &&
+        mkdir -p /tmp/eap8-tmp &&
+        nohup ${JBOSS_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8280 -Djboss.management.http.port=10190 -Djboss.server.temp.dir=/tmp/eap8-tmp > /tmp/eap8.log 2>&1 &
+        echo "Waiting for EAP 8 to start..." &&
+        for i in $(seq 1 60); do
+          if ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190 --command=":read-attribute(name=server-state)" 2>/dev/null | grep -q running; then
+            echo "EAP 8 is running";
+            break;
+          fi;
+          sleep 3;
+        done &&
+        echo "EAP 8 initialized with PostgreSQL datasource"
+      label: 'Provision and start EAP 8 with PostgreSQL datasource'
+
+  - id: start-eap8
+    exec:
+      component: eap8
+      commandLine: >-
+        export HOSTNAME=mammoth2 &&
+        mkdir -p /tmp/eap8-tmp &&
+        ${JBOSS_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8280 -Djboss.management.http.port=10190 -Djboss.server.temp.dir=/tmp/eap8-tmp
+      label: 'Start JBoss EAP 8 server (foreground)'
+
+  - id: stop-eap8
+    exec:
+      component: eap8
+      commandLine: >-
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190 --command=shutdown
+      label: 'Stop JBoss EAP 8 server'
+
+  - id: deploy-eap8
+    exec:
+      component: eap8
+      commandLine: >-
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190
+        --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
+      workingDir: ${PROJECT_SOURCE}
+      label: 'Deploy EAR to JBoss EAP 8'
+
+  - id: undeploy-eap8
+    exec:
+      component: eap8
+      commandLine: >-
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190
+        --command="undeploy mammoth-ear.ear"
+      label: 'Undeploy EAR from JBoss EAP 8'
 
 events:
   postStart:
