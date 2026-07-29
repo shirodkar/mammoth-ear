@@ -38,7 +38,7 @@ components:
         - name: HUB_SOLUTION_SERVER_ENABLED
           value: 'true'
 
-  - name: eap7
+  - name: eap
     container:
       image: registry.redhat.io/jboss-eap-7/eap74-openjdk11-openshift-rhel8:latest
       memoryLimit: 3Gi
@@ -48,11 +48,11 @@ components:
       mountSources: true
       sourceMapping: /projects
       endpoints:
-        - name: eap7-http
+        - name: eap-http
           targetPort: 8180
           exposure: public
           protocol: http
-        - name: eap7-admin
+        - name: eap-admin
           targetPort: 10090
           exposure: internal
       env:
@@ -93,7 +93,7 @@ components:
       size: 2Gi
 
 commands:
-  - id: install-extensions
+  - id: setup-ide
     exec:
       component: tools
       commandLine: >-
@@ -107,7 +107,7 @@ commands:
         mkdir -p /checode/remote/data/Machine &&
         echo '{"java.server.launchMode":"Standard","java.configuration.updateBuildConfiguration":"automatic","mta-core.genai.agentMode":true}' > /checode/remote/data/Machine/settings.json;
         true
-      label: 'Download MTA extension and configure provider settings'
+      label: 'Set up IDE'
 
   - id: init-db
     exec:
@@ -120,7 +120,7 @@ commands:
         done &&
         psql -U mammoth -d mammothdb -f ${PROJECT_SOURCE}/init-db.sql
       workingDir: ${PROJECT_SOURCE}
-      label: 'Initialize database with mammoth facts'
+      label: 'Initialize database'
 
   - id: build
     exec:
@@ -130,7 +130,7 @@ commands:
       group:
         kind: build
         isDefault: true
-      label: 'Build the EAR application'
+      label: 'Build application'
 
   - id: test
     exec:
@@ -140,11 +140,11 @@ commands:
       group:
         kind: test
         isDefault: true
-      label: 'Run unit and integration tests'
+      label: 'Test application'
 
-  - id: init-eap7
+  - id: init-eap
     exec:
-      component: eap7
+      component: eap
       commandLine: |
         export HOSTNAME=mammoth1 &&
         mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main &&
@@ -164,27 +164,11 @@ commands:
           sleep 3;
         done &&
         echo "EAP 7 initialized with PostgreSQL datasource"
-      label: 'Start EAP 7, install PostgreSQL driver, and configure datasource'
+      label: 'Start EAP'
 
-  - id: start-eap7
+  - id: deploy-eap
     exec:
-      component: eap7
-      commandLine: >-
-        export HOSTNAME=mammoth1 &&
-        mkdir -p /tmp/eap-tmp &&
-        ${JBOSS_HOME}/bin/standalone.sh -c standalone-openshift.xml -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10090 -Djboss.server.temp.dir=/tmp/eap-tmp
-      label: 'Start JBoss EAP 7 server (foreground)'
-
-  - id: stop-eap7
-    exec:
-      component: eap7
-      commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090 --command=shutdown
-      label: 'Stop JBoss EAP 7 server'
-
-  - id: deploy-eap7
-    exec:
-      component: eap7
+      component: eap
       commandLine: >-
         ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090
         --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
@@ -192,17 +176,9 @@ commands:
       group:
         kind: run
         isDefault: true
-      label: 'Deploy EAR to JBoss EAP 7'
-
-  - id: undeploy-eap7
-    exec:
-      component: eap7
-      commandLine: >-
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10090
-        --command="undeploy mammoth-ear.ear"
-      label: 'Undeploy EAR from JBoss EAP 7'
+      label: 'Deploy application'
 
 events:
   postStart:
-    - install-extensions
+    - setup-ide
     - init-db
