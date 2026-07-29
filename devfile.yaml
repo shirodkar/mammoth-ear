@@ -226,6 +226,18 @@ commands:
         echo "EAP 8 initialized with PostgreSQL datasource"
       label: 'Start EAP'
 
+  - id: deploy-eap
+    exec:
+      component: eap
+      commandLine: >-
+        /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190
+        --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: run
+        isDefault: true
+      label: 'Deploy application'
+
 events:
   postStart:
     - setup-ide
