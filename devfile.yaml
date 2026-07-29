@@ -38,7 +38,7 @@ components:
         - name: HUB_SOLUTION_SERVER_ENABLED
           value: 'true'
 
-  - name: eap8
+  - name: eap
     container:
       image: registry.redhat.io/jboss-eap-8/eap81-openjdk21-builder-openshift-rhel9:latest
       memoryLimit: 3Gi
@@ -50,16 +50,16 @@ components:
       command: ['tail']
       args: ['-f', '/dev/null']
       endpoints:
-        - name: eap8-http
-          targetPort: 8280
+        - name: eap-http
+          targetPort: 8180
           exposure: public
           protocol: http
-        - name: eap8-admin
-          targetPort: 10190
+        - name: eap-admin
+          targetPort: 10090
           exposure: internal
       env:
         - name: MAMMOTH_API_URL
-          value: http://localhost:8280/backend/api/mammoths
+          value: http://localhost:8180/backend/api/mammoths
         - name: JBOSS_NODE_NAME
           value: mammoth2
 
@@ -95,7 +95,7 @@ components:
       size: 2Gi
 
 commands:
-  - id: install-extensions
+  - id: setup-ide
     exec:
       component: tools
       commandLine: >-
@@ -109,7 +109,7 @@ commands:
         mkdir -p /checode/remote/data/Machine &&
         echo '{"java.server.launchMode":"Standard","java.configuration.updateBuildConfiguration":"automatic","mta-core.genai.agentMode":true}' > /checode/remote/data/Machine/settings.json;
         true
-      label: 'Download MTA extension and configure provider settings'
+      label: 'Set up IDE'
 
   - id: init-db
     exec:
@@ -122,7 +122,7 @@ commands:
         done &&
         psql -U mammoth -d mammothdb -f ${PROJECT_SOURCE}/init-db.sql
       workingDir: ${PROJECT_SOURCE}
-      label: 'Initialize database with mammoth facts'
+      label: 'Initialize database'
 
   - id: build
     exec:
@@ -132,7 +132,7 @@ commands:
       group:
         kind: build
         isDefault: true
-      label: 'Build the EAR application'
+      label: 'Build application'
 
   - id: test
     exec:
@@ -142,11 +142,11 @@ commands:
       group:
         kind: test
         isDefault: true
-      label: 'Run unit and integration tests'
+      label: 'Test application'
 
-  - id: init-eap8
+  - id: init-eap
     exec:
-      component: eap8
+      component: eap
       commandLine: |
         export HOSTNAME=mammoth2 &&
         EAP_HOME=${JBOSS_HOME:-/opt/server} &&
@@ -214,7 +214,7 @@ commands:
         ${EAP_HOME}/bin/jboss-cli.sh --file=/tmp/configure-eap8.cli &&
         echo "EAP 8 configured" &&
         mkdir -p /tmp/eap8-tmp &&
-        nohup ${EAP_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8280 -Djboss.management.http.port=10190 -Djboss.server.temp.dir=/tmp/eap8-tmp > /tmp/eap8.log 2>&1 &
+        nohup ${EAP_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8180 -Djboss.management.http.port=10190 -Djboss.server.temp.dir=/tmp/eap8-tmp > /tmp/eap8.log 2>&1 &
         echo "Waiting for EAP 8 to start..." &&
         for i in $(seq 1 60); do
           if ${EAP_HOME}/bin/jboss-cli.sh --connect --controller=localhost:10190 --command=":read-attribute(name=server-state)" 2>/dev/null | grep -q running; then
@@ -224,45 +224,9 @@ commands:
           sleep 3;
         done &&
         echo "EAP 8 initialized with PostgreSQL datasource"
-      label: 'Provision and start EAP 8 with PostgreSQL datasource'
-
-  - id: start-eap8
-    exec:
-      component: eap8
-      commandLine: >-
-        export HOSTNAME=mammoth2 &&
-        mkdir -p /tmp/eap8-tmp &&
-        /opt/server/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -Djboss.http.port=8280 -Djboss.management.http.port=10190 -Djboss.server.temp.dir=/tmp/eap8-tmp
-      label: 'Start JBoss EAP 8 server (foreground)'
-
-  - id: stop-eap8
-    exec:
-      component: eap8
-      commandLine: >-
-        /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190 --command=shutdown
-      label: 'Stop JBoss EAP 8 server'
-
-  - id: deploy-eap8
-    exec:
-      component: eap8
-      commandLine: >-
-        /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190
-        --command="deploy ${PROJECT_SOURCE}/ear/target/mammoth-ear.ear --force"
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: run
-        isDefault: true
-      label: 'Deploy EAR to JBoss EAP 8'
-
-  - id: undeploy-eap8
-    exec:
-      component: eap8
-      commandLine: >-
-        /opt/server/bin/jboss-cli.sh --connect --controller=localhost:10190
-        --command="undeploy mammoth-ear.ear"
-      label: 'Undeploy EAR from JBoss EAP 8'
+      label: 'Start EAP'
 
 events:
   postStart:
-    - install-extensions
+    - setup-ide
     - init-db
