@@ -32,7 +32,7 @@ components:
         - name: FORCE_HUB_ENABLED
           value: 'true'
         - name: HUB_URL
-          value: 'http://mta-hub.openshift-mta.svc.cluster.local:8080'
+          value: 'http://mta-ui.openshift-mta.svc.cluster.local:8080'
         - name: HUB_PROFILE_SYNC_ENABLED
           value: 'true'
         - name: HUB_SOLUTION_SERVER_ENABLED
