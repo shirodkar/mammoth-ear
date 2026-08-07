@@ -62,7 +62,6 @@ class MammothResourceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testGetAllFacts_returns200() {
         List<MammothFact> facts = Arrays.asList(
                 new MammothFact("Anatomy", "Tusks", "Long tusks"),
@@ -86,7 +85,6 @@ class MammothResourceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testGetFactsByCategory_returns200() {
         List<MammothFact> facts = Arrays.asList(
                 new MammothFact("Diet", "Big Eaters", "Ate a lot")
@@ -119,7 +117,6 @@ class MammothResourceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testGetCategories_returns200() {
         List<String> categories = Arrays.asList("Anatomy", "Diet");
         when(factService.findCategories()).thenReturn(categories);
