@@ -113,12 +113,13 @@ commands:
     exec:
       component: postgresql
       commandLine: >-
-        for i in $(seq 1 30); do
-        pg_isready -U mammoth -d mammothdb -q && break;
-        echo "Waiting for PostgreSQL to be ready... ($i/30)";
-        sleep 2;
+        for i in $(seq 1 60); do
+        pg_isready -U mammoth -d mammothdb >/dev/null 2>&1 && break;
+        echo "Waiting for PostgreSQL to be ready... ($i/60)";
+        if [ $i -eq 60 ]; then echo "ERROR: PostgreSQL failed to start"; exit 1; fi;
+        sleep 1;
         done &&
-        psql -U mammoth -d mammothdb -f ${PROJECT_SOURCE}/init-db.sql
+        psql -U mammoth -d mammothdb -f ${PROJECT_SOURCE}/init-db.sql && echo "Database initialized successfully"
       workingDir: ${PROJECT_SOURCE}
       label: 'Initialize database'
 
@@ -181,4 +182,3 @@ commands:
 events:
   postStart:
     - setup-ide
-    - init-db
