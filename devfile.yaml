@@ -106,6 +106,8 @@ commands:
         /checode/remote/data/User/globalStorage/redhat.mta-core/settings/provider-settings.yaml;
         mkdir -p /checode/remote/data/Machine &&
         echo '{"java.server.launchMode":"Standard","java.configuration.updateBuildConfiguration":"automatic","mta-core.genai.agentMode":true}' > /checode/remote/data/Machine/settings.json;
+        mkdir -p /checode/remote/data/User/globalStorage/ms-vscode/CodeTrust &&
+        echo '["/projects"]' > /checode/remote/data/User/globalStorage/ms-vscode/CodeTrust/trustedFolders.json;
         true
       label: 'Set up IDE'
 
