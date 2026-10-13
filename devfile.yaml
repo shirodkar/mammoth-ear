@@ -267,4 +267,3 @@ commands:
 events:
   postStart:
     - install-extensions
-    - init-db
