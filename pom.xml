@@ -28,6 +28,26 @@
         <module>ear</module>
     </modules>
 
+   <repositories>
+       <repository>
+           <id>jboss</id>
+           <url>https://maven.repository.redhat.com/ga/</url>
+           <snapshots>
+               <enabled>false</enabled>
+           </snapshots>
+       </repository>
+   </repositories>
+
+   <pluginRepositories>
+       <pluginRepository>
+           <id>jboss</id>
+           <url>https://maven.repository.redhat.com/ga/</url>
+           <snapshots>
+               <enabled>false</enabled>
+           </snapshots>
+       </pluginRepository>
+   </pluginRepositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
