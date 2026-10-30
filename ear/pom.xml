@@ -88,7 +88,6 @@
                        </feature-packs>
                        <layers>
                            <layer>cloud-server</layer>
-                           <layer>postgresqlserver-datasource</layer>
                        </layers>
                        <galleon-options>
                            <jboss-fork-embedded>true</jboss-fork-embedded>
