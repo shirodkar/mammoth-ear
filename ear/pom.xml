@@ -95,13 +95,6 @@
                        <galleon-options>
                            <jboss-fork-embedded>true</jboss-fork-embedded>
                        </galleon-options>
-                       <packaging-scripts>
-                           <packaging-script>
-                               <scripts>
-                                   <script>${project.basedir}/scripts/configure.cli</script>
-                               </scripts>
-                           </packaging-script>
-                       </packaging-scripts>
                    </configuration>
                    <executions>
                        <execution>
