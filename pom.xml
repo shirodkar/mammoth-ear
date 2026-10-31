@@ -48,8 +48,35 @@
        </pluginRepository>
    </pluginRepositories>
 
-    <dependencyManagement>
-        <dependencies>
+   <dependencyManagement>
+       <dependencies>
+           <!-- Jakarta EE 10 BOM -->
+           <dependency>
+               <groupId>jakarta.platform</groupId>
+               <artifactId>jakarta.jakartaee-bom</artifactId>
+               <version>${jakartaee.version}</version>
+               <type>pom</type>
+               <scope>import</scope>
+           </dependency>
+
+           <!-- Backend API WAR -->
+           <dependency>
+               <groupId>${project.groupId}</groupId>
+               <artifactId>backend-api</artifactId>
+               <version>${project.version}</version>
+               <type>war</type>
+               <scope>compile</scope>
+           </dependency>
+
+           <!-- Frontend WAR -->
+           <dependency>
+               <groupId>${project.groupId}</groupId>
+               <artifactId>frontend</artifactId>
+               <version>${project.version}</version>
+               <type>war</type>
+               <scope>compile</scope>
+           </dependency>
+
             <dependency>
                 <groupId>jakarta.platform</groupId>
                 <artifactId>jakarta.jakartaee-api</artifactId>
