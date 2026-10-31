@@ -5,20 +5,12 @@
 #   2. A PostgreSQL database named 'mammothdb' must exist
 #
 # Usage:
-#   $JBOSS_HOME/bin/jboss-cli.sh --connect --file=configure-datasource.cli
+#   $JBOSS_HOME/bin/jboss-cli.sh --connect --file=configure.cli
 #
 # Or run commands manually in jboss-cli:
 
 # Deploy PostgreSQL JDBC driver as a module (adjust path to your driver jar)
 # module add --name=org.postgresql --resources=/path/to/postgresql-42.7.3.jar --dependencies=javax.api,javax.transaction.api
-
-# Register the JDBC driver
-/subsystem=datasources/jdbc-driver=postgresql:add( \
-    driver-name=postgresql, \
-    driver-module-name=org.postgresql, \
-    driver-class-name=org.postgresql.Driver, \
-    driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource \
-)
 
 # Create the datasource
 data-source add \

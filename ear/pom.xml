@@ -96,7 +96,7 @@
                        <packaging-scripts>
                            <packaging-script>
                                <scripts>
-                                   <script>${project.basedir}/scripts/configure-datasource.cli</script>
+                                   <script>${project.basedir}/scripts/configure.cli</script>
                                </scripts>
                            </packaging-script>
                        </packaging-scripts>
