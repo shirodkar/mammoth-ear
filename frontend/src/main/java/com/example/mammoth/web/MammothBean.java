@@ -148,4 +148,30 @@ public class MammothBean {
     public List<FactCategory> getFactCategories() {
         return factCategories;
     }
+
+    public String getJavaVersion() {
+        return System.getProperty("java.version");
+    }
+
+    public String getEapVersion() {
+        String version = System.getProperty("jboss.product.version");
+        if (version == null || version.isEmpty()) {
+            version = System.getProperty("jboss.as.release.version", "Unknown");
+        }
+        return version;
+    }
+
+    public String getJakartaEeVersion() {
+        try {
+            Class<?> clazz = Class.forName("jakarta.servlet.ServletContext");
+            Package pkg = clazz.getPackage();
+            String version = pkg.getSpecificationVersion();
+            if (version != null && !version.isEmpty()) {
+                return version;
+            }
+        } catch (ClassNotFoundException e) {
+            // ignore
+        }
+        return "10";
+    }
 }
