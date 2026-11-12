@@ -13,8 +13,8 @@
     <description>Java EE 8 application providing mammoth facts with JPA/PostgreSQL backend and JSF dark mode frontend</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jakartaee.version>10.0.0</jakartaee.version>
         <junit.version>5.9.3</junit.version>
